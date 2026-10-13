@@ -1,0 +1,8 @@
+# Generated lockfile — never reformat (pnpm rewrites it in its own style)
+pnpm-lock.yaml
+
+# Build output
+dist
+
+# Hand-authored instructions, kept in the author's own formatting
+CLAUDE.md
