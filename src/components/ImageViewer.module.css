@@ -1,0 +1,66 @@
+.viewer {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.zoom {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.scale {
+  min-width: 3.5em;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* A flex box, so the image can be centred with margins and still scroll to every edge
+   once it's larger than the frame. It takes the image's proportions, so a fitted image
+   fills it, within a floor and a ceiling for very wide and very tall images. */
+.frame {
+  display: flex;
+  min-height: 160px;
+  max-height: min(62vh, 600px);
+  overflow: auto;
+  border-radius: 8px;
+  background: var(--sunken);
+}
+
+.image {
+  display: block;
+  flex: none;
+  margin: auto;
+}
+
+.fitted {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+}
+
+.caption {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}

@@ -1,0 +1,14 @@
+/* One class per NoticeKind value. */
+
+.notice {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.status {
+  color: var(--muted);
+}
+
+.problem {
+  color: var(--problem);
+}
