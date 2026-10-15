@@ -1,0 +1,32 @@
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  box-sizing: border-box;
+  min-height: 56px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--toolbar);
+  backdrop-filter: blur(8px);
+}
+
+.brand {
+  flex: none;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}

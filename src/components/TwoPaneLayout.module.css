@@ -1,0 +1,21 @@
+.layout {
+  display: grid;
+  gap: 16px;
+}
+
+.panes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  align-items: start;
+  gap: 16px;
+}
+
+.pane {
+  min-width: 0;
+}
+
+@media (max-width: 860px) {
+  .panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
