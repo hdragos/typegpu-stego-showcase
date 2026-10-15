@@ -1,0 +1,57 @@
+/* The colours and sizes every component shares, for light and dark mode. */
+
+:root {
+  color-scheme: light dark;
+  --background: #f4f3f0;
+  --surface: #ffffff;
+  --sunken: #e9e7e1;
+  --text: #1f1f23;
+  --muted: #5f5f66;
+  --accent: #4f46e5;
+  --accent-text: #ffffff;
+  --border: #dcdad3;
+  --hover: rgba(79, 70, 229, 0.08);
+  --problem: #b42318;
+  --toolbar: rgba(244, 243, 240, 0.88);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --radius: 10px;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  line-height: 1.5;
+  background: var(--background);
+  color: var(--text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #16161a;
+    --surface: #1f1f25;
+    --sunken: #121216;
+    --text: #ececf1;
+    --muted: #a1a1aa;
+    --accent: #8b87ff;
+    --accent-text: #0b0b10;
+    --border: #33333b;
+    --hover: rgba(139, 135, 255, 0.12);
+    --problem: #ff8a80;
+    --toolbar: rgba(22, 22, 26, 0.88);
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
