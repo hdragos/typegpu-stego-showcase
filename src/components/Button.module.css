@@ -40,3 +40,10 @@
 .ghost:hover:not(:disabled) {
   background: var(--hover);
 }
+
+/* A button that switches something on, such as a view, while it's on. */
+.button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--hover);
+  color: var(--accent);
+}

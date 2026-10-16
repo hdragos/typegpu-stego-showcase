@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fitScale, formatScale, zoomInFrom, zoomOutFrom } from './zoom';
+import { fitScale, formatPercent, zoomInFrom, zoomOutFrom } from './zoom';
 
 describe('zoomInFrom and zoomOutFrom', () => {
   it('step to the next zoom level', () => {
@@ -28,9 +28,10 @@ describe('fitScale', () => {
   });
 });
 
-describe('formatScale', () => {
-  it('shows a scale as a whole percentage', () => {
-    expect(formatScale(1.5)).toBe('150%');
-    expect(formatScale(0.333)).toBe('33%');
+describe('formatPercent', () => {
+  it('shows a fraction as a whole percentage', () => {
+    expect(formatPercent(1.5)).toBe('150%');
+    expect(formatPercent(0.333)).toBe('33%');
+    expect(formatPercent(0)).toBe('0%');
   });
 });
