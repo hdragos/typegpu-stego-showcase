@@ -9,6 +9,10 @@ The toolbar has an Encode and a Decode menu, and each lists the algorithms it ca
 use: LSB for now, with PVD to follow. Everything runs in the browser: images are
 never uploaded.
 
+Both pages share the channel masks: which bits of red, green and blue hold the
+message. The default, 1, 1, 1, is the lowest bit of each. Change them by number, or
+bit by bit. An image decodes only with the masks it was encoded with.
+
 ## Running it
 
 The app uses the library from a sibling folder, so clone both side by side, and build
@@ -30,7 +34,7 @@ pnpm dev
 - `src/app/`: the Redux store, the router, and the layout every page shares, with its
   toolbar.
 - `src/features/`: one folder per page, `encode/` and `decode/`, each with its Redux
-  slice and thunks.
+  slice and thunks, and `channelMasks/`, for the masks both pages share.
 - `src/components/`: generic UI, such as buttons, dropdown menus, panes and the image
   viewer. It knows nothing about steganography.
 - `src/stego/`: the app's logic that isn't UI: the codec, reading and saving images,
@@ -42,7 +46,7 @@ from the one `index.html`.
 
 ## How it keeps the message intact
 
-The message lives in the lowest bit of each colour, so anything that nudges pixel
+The message lives in the bits the channel masks select, so anything that nudges pixel
 values destroys it. The app avoids the three ways a browser can do that:
 
 - **Colour management.** Images are decoded with colour conversion off, so the pixels
