@@ -1,0 +1,43 @@
+.modal {
+  box-sizing: border-box;
+  width: min(760px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+/* Only an open dialog is laid out, so a closed one stays hidden. */
+.modal[open] {
+  display: grid;
+  gap: 16px;
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.description {
+  margin: -8px 0 0;
+  color: var(--muted);
+}
+
+.body {
+  display: grid;
+  gap: 16px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}

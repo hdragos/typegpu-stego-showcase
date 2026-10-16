@@ -1,0 +1,39 @@
+.row {
+  display: flex;
+  gap: 2px;
+}
+
+.bit {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.index {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.toggle {
+  width: 24px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--muted);
+  font: inherit;
+  font-family: ui-monospace, monospace;
+  cursor: pointer;
+}
+
+.toggle:hover {
+  background: var(--hover);
+}
+
+.toggle[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
