@@ -1,9 +1,17 @@
 // Hiding text in images and reading it back, through typegpu-stego.
 
-import { createLsbCodec, GpuBackendError, type PixelBuffer, type StegoCodec } from 'typegpu-stego';
+import {
+  GpuBackendError,
+  GpuLsbCodec,
+  requestGpuDevice,
+  type PixelBuffer,
+  type StegoCodec,
+} from 'typegpu-stego';
 import { Algorithm } from '../constants/algorithms';
+import type { ChannelMasks } from '../constants/channelMasks';
 import { Problem } from '../constants/messages';
 import { TEXT_ENCODING } from '../constants/text';
+import { sameMasks, toLibraryMasks } from './channelMasks';
 
 /** Thrown when an image holds hidden data that isn't UTF-8 text. */
 export class NotTextError extends Error {
@@ -13,25 +21,43 @@ export class NotTextError extends Error {
   }
 }
 
-const codecs = new Map<Algorithm, Promise<StegoCodec>>();
+let device: Promise<GPUDevice | null> | undefined;
+
+/** The page's GPU device, or null without one. It's looked for once, and every codec shares it. */
+function getDevice(): Promise<GPUDevice | null> {
+  device ??= requestGpuDevice();
+  return device;
+}
+
+interface KeptCodec {
+  readonly channelMasks: ChannelMasks;
+  readonly codec: Promise<StegoCodec>;
+}
+
+/** The latest codec made for each algorithm. */
+const codecs = new Map<Algorithm, KeptCodec>();
 
 /**
- * The page's codec for `algorithm`. Creating one looks for a GPU, and its first GPU calls
- * compile the kernels, so each is made once and reused.
+ * The page's codec for `algorithm`, with these channel masks. A codec's first GPU calls
+ * compile its kernels, so the latest one is kept, and reused while the masks stay the same.
  */
-export function getCodec(algorithm: Algorithm): Promise<StegoCodec> {
-  let codec = codecs.get(algorithm);
-  if (codec === undefined) {
-    codec = createCodec(algorithm);
-    codecs.set(algorithm, codec);
+export function getCodec(algorithm: Algorithm, channelMasks: ChannelMasks): Promise<StegoCodec> {
+  const kept = codecs.get(algorithm);
+  if (kept !== undefined && sameMasks(kept.channelMasks, channelMasks)) {
+    return kept.codec;
   }
+  const codec = createCodec(algorithm, channelMasks);
+  codecs.set(algorithm, { channelMasks, codec });
   return codec;
 }
 
-function createCodec(algorithm: Algorithm): Promise<StegoCodec> {
+async function createCodec(algorithm: Algorithm, channelMasks: ChannelMasks): Promise<StegoCodec> {
+  // The device is already found, so the codec is built from it, rather than through
+  // createLsbCodec, which would look for another one.
+  const gpuDevice = await getDevice();
   switch (algorithm) {
     case Algorithm.LSB:
-      return createLsbCodec();
+      return new GpuLsbCodec({ channelMasks: toLibraryMasks(channelMasks) }, gpuDevice);
   }
 }
 
@@ -49,18 +75,16 @@ export function bytesToText(bytes: Uint8Array): string {
 }
 
 /** Hide `message` in a copy of `carrier`. */
-export async function hideMessage(
-  algorithm: Algorithm,
+export function hideMessage(
+  codec: StegoCodec,
   carrier: PixelBuffer,
   message: string,
 ): Promise<PixelBuffer> {
-  const codec = await getCodec(algorithm);
   return retryAfterGpuFailure(() => codec.encode(carrier, textToBytes(message)));
 }
 
 /** Read the message hidden in `image`. */
-export async function revealMessage(algorithm: Algorithm, image: PixelBuffer): Promise<string> {
-  const codec = await getCodec(algorithm);
+export async function revealMessage(codec: StegoCodec, image: PixelBuffer): Promise<string> {
   return bytesToText(await retryAfterGpuFailure(() => codec.decode(image)));
 }
 
