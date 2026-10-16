@@ -5,12 +5,16 @@ import { TwoPaneLayout } from '../../components/TwoPaneLayout';
 import { ALGORITHM_INFO, type Algorithm } from '../../constants/algorithms';
 import { Operation, OPERATION_LABEL } from '../../constants/operations';
 import { HOME_PATH } from '../../constants/routes';
+import { ChannelMasksPanel } from '../channelMasks/ChannelMasksPanel';
 import { useAlgorithmParam } from '../useAlgorithmParam';
 import { CarrierPane } from './CarrierPane';
 import { EncodeControls } from './EncodeControls';
 import { EncodedResult } from './EncodedResult';
 
-/** The encode page: the image on the left, the message on the right, the result below. */
+/**
+ * The encode page: the image on the left, the message and the channel masks on the right,
+ * and the result below.
+ */
 export function EncodePage() {
   const algorithm = useAlgorithmParam();
   if (algorithm === null) {
@@ -30,7 +34,12 @@ function EncodeWorkspace({ algorithm }: { readonly algorithm: Algorithm }) {
       />
       <TwoPaneLayout
         main={<CarrierPane algorithm={algorithm} />}
-        side={<EncodeControls algorithm={algorithm} />}
+        side={
+          <>
+            <EncodeControls algorithm={algorithm} />
+            <ChannelMasksPanel algorithm={algorithm} />
+          </>
+        }
         below={result !== null && <EncodedResult algorithm={algorithm} result={result} />}
       />
     </>

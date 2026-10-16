@@ -19,8 +19,9 @@ export const Problem = {
   NO_IMAGE: 'Choose an image first.',
   MESSAGE_TOO_LONG: 'The message is too long for this image. Shorten it, or choose a bigger image.',
   NO_MESSAGE:
-    "This image doesn't hold a message. If it did, the image may have changed since, for " +
-    'example by being saved as a JPEG or sent through a chat app.',
+    "This image doesn't hold a message with these channel masks. If it was encoded with " +
+    'others, change them to match. If not, the image may have changed since, for example ' +
+    'by being saved as a JPEG or sent through a chat app.',
   NOT_TEXT: "This image holds hidden data, but it isn't text.",
   MASK_OUT_OF_RANGE: `Each mask is a whole number from ${MIN_MASK} to ${MAX_MASK}.`,
   NO_BITS_SELECTED: 'Select at least one bit.',

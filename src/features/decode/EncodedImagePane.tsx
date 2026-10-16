@@ -32,7 +32,7 @@ export function EncodedImagePane({ algorithm }: { readonly algorithm: Algorithm 
       {image === null ? (
         <EmptyState
           title="Choose an image with a message in it"
-          description="A PNG encoded here, or by typegpu-stego with its default settings."
+          description="A PNG encoded here or by typegpu-stego. Set the channel masks it was encoded with."
           actions={choice}
         />
       ) : (

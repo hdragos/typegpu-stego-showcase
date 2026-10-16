@@ -13,6 +13,7 @@ export const ALGORITHM_INFO: Readonly<
 > = {
   [Algorithm.LSB]: {
     name: 'LSB',
-    summary: 'Least significant bit: the lowest bit of each colour holds the message.',
+    summary:
+      'Least significant bit: the message hides in chosen bits of each colour, by default the lowest.',
   },
 };

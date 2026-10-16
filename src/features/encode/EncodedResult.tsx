@@ -46,7 +46,7 @@ export function EncodedResult({ algorithm, result }: EncodedResultProps) {
         alt="The image with the message hidden in it"
         width={result.width}
         height={result.height}
-        caption="It looks the same, but it now holds your message. Keep it as a PNG, and share it as a file: apps that compress images, such as most chat apps, destroy the message."
+        caption="It now holds your message. Keep it as a PNG, and share it as a file: apps that compress images, such as most chat apps, destroy the message."
       />
     </Panel>
   );
