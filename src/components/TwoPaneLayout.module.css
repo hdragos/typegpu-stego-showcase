@@ -10,7 +10,10 @@
   gap: 16px;
 }
 
+/* A pane can hold several panels, one under the other. */
 .pane {
+  display: grid;
+  gap: 16px;
   min-width: 0;
 }
 
