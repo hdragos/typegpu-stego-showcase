@@ -1,4 +1,4 @@
-// The image viewer's zoom arithmetic, kept apart from the component so it can be tested.
+// The image viewer's arithmetic, kept apart from the component so it can be tested.
 
 import { ACTUAL_SIZE, SCALE_TOLERANCE, ZOOM_STEPS } from './constants';
 
@@ -30,7 +30,7 @@ export function fitScale(
   return Math.min(boxWidth / width, boxHeight / height, ACTUAL_SIZE);
 }
 
-/** A scale as a percentage, such as 150%. */
-export function formatScale(scale: number): string {
-  return `${Math.round(scale * 100)}%`;
+/** A fraction as a whole percentage: a scale of 1.5 as 150%, or an opacity of 0.5 as 50%. */
+export function formatPercent(fraction: number): string {
+  return `${Math.round(fraction * 100)}%`;
 }

@@ -44,3 +44,13 @@ export const ACTUAL_SIZE = 1;
 
 /** How close two scales must be to count as the same, to absorb rounding. */
 export const SCALE_TOLERANCE = 1e-6;
+
+/** Opacities run from fully see-through to solid. */
+export const MIN_OPACITY = 0;
+export const MAX_OPACITY = 1;
+
+/** How far the onion skin slider moves the opacity in one step: 1%. */
+export const OPACITY_STEP = 0.01;
+
+/** How much of the newer image an onion skin shows when it's switched on: half. */
+export const ONION_SKIN_START = 0.5;

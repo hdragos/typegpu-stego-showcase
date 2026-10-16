@@ -13,6 +13,10 @@ Both pages share the channel masks: which bits of red, green and blue hold the
 message. The default, 1, 1, 1, is the lowest bit of each. Change them by number, or
 bit by bit. An image decodes only with the masks it was encoded with.
 
+To compare an encoded image with the original, switch on its onion skin, as in
+GitHub's image diffs. It lays the encoded image over the original, with a slider to
+fade from one to the other.
+
 ## Running it
 
 The app uses the library from a sibling folder, so clone both side by side, and build

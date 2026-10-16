@@ -32,11 +32,27 @@
   gap: 8px;
 }
 
-/* A flex box, so the image can be centred with margins and still scroll to every edge
-   once it's larger than the frame. It takes the image's proportions, so a fitted image
-   fills it, within a floor and a ceiling for very wide and very tall images. */
-.frame {
+.onionSkin {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.slider {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--accent);
+}
+
+/* A grid with one cell the size of the frame, so an onion skin's images can lie on top of
+   each other in it. Each image is centred with margins, and still scrolls to every edge
+   once it's larger than the frame. The frame takes the image's proportions, so a fitted
+   image fills it, within a floor and a ceiling for very wide and very tall images. */
+.frame {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   min-height: 160px;
   max-height: min(62vh, 600px);
   overflow: auto;
@@ -46,7 +62,7 @@
 
 .image {
   display: block;
-  flex: none;
+  grid-area: 1 / 1;
   margin: auto;
 }
 

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { useAppDispatch } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Button } from '../../components/Button';
 import { ButtonLink } from '../../components/ButtonLink';
 import { ButtonVariant } from '../../components/constants';
@@ -16,10 +16,14 @@ interface EncodedResultProps {
   readonly result: ImageInfo;
 }
 
-/** Below the panes: the encoded image, to download, or to decode straight away. */
+/**
+ * Below the panes: the encoded image, to download, or to decode straight away. Its onion
+ * skin lays it over the original, to compare them.
+ */
 export function EncodedResult({ algorithm, result }: EncodedResultProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const carrier = useAppSelector((state) => state.encode.carrier);
 
   function decodeIt() {
     dispatch(decodeEncodedResult(algorithm));
@@ -46,6 +50,16 @@ export function EncodedResult({ algorithm, result }: EncodedResultProps) {
         alt="The image with the message hidden in it"
         width={result.width}
         height={result.height}
+        onionSkin={
+          carrier === null
+            ? undefined
+            : {
+                beforeSrc: carrier.previewUrl,
+                beforeAlt: 'The original image',
+                beforeLabel: 'Original',
+                afterLabel: 'Encoded',
+              }
+        }
         caption="It now holds your message. Keep it as a PNG, and share it as a file: apps that compress images, such as most chat apps, destroy the message."
       />
     </Panel>
