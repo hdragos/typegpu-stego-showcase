@@ -1,9 +1,9 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { Problem } from '../../constants/messages';
 import { Operation } from '../../constants/operations';
 import { Status } from '../../constants/status';
 import type { ImageInfo } from '../../stego/imageStore';
-import { decodeImage } from './decodeThunks';
+import { decodeImage, redecodeImage } from './decodeThunks';
 
 /** What decoding an image found: its message, or why it has none. */
 export type DecodeOutcome =
@@ -29,16 +29,23 @@ const decodeSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(decodeImage.pending, (state) => {
-        state.status = Status.DECODING;
-        state.outcome = null;
-      })
       .addCase(decodeImage.fulfilled, (state, action) => {
         state.image = action.payload.image;
         state.outcome = action.payload.outcome;
         state.status = Status.IDLE;
       })
-      .addCase(decodeImage.rejected, (state, action) => {
+      .addCase(redecodeImage.fulfilled, (state, action) => {
+        state.status = Status.IDLE;
+        // Another image may have replaced it while it was decoded.
+        if (state.image?.id === action.meta.arg.image.id) {
+          state.outcome = action.payload;
+        }
+      })
+      .addMatcher(isAnyOf(decodeImage.pending, redecodeImage.pending), (state) => {
+        state.status = Status.DECODING;
+        state.outcome = null;
+      })
+      .addMatcher(isAnyOf(decodeImage.rejected, redecodeImage.rejected), (state, action) => {
         state.status = Status.IDLE;
         state.outcome = { found: false, problem: action.error.message ?? Problem.UNEXPECTED };
       });

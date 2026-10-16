@@ -3,7 +3,8 @@ import type { AppThunk } from '../../app/store';
 import { Operation } from '../../constants/operations';
 import { Status } from '../../constants/status';
 import { forgetImage, type ImageInfo } from '../../stego/imageStore';
-import { encodeMessage, loadCarrier } from './encodeThunks';
+import { channelMasksChanged } from '../channelMasks/channelMasksSlice';
+import { encodeMessage, loadCarrier, measureCarrier } from './encodeThunks';
 
 /** The image a message is encoded into, and what it can hold. */
 export interface CarrierInfo extends ImageInfo {
@@ -42,6 +43,10 @@ const encodeSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(channelMasksChanged, (state) => {
+        // An image encoded with the old masks no longer decodes with the new ones.
+        state.result = null;
+      })
       .addCase(loadCarrier.pending, (state) => {
         state.status = Status.READING_IMAGE;
         state.problem = null;
@@ -53,6 +58,15 @@ const encodeSlice = createSlice({
       })
       .addCase(loadCarrier.rejected, (state, action) => {
         state.status = Status.IDLE;
+        state.problem = action.payload ?? action.error.message ?? null;
+      })
+      .addCase(measureCarrier.fulfilled, (state, action) => {
+        // The carrier may have changed while it was measured.
+        if (state.carrier?.id === action.payload.carrierId) {
+          state.carrier.capacity = action.payload.capacity;
+        }
+      })
+      .addCase(measureCarrier.rejected, (state, action) => {
         state.problem = action.payload ?? action.error.message ?? null;
       })
       .addCase(encodeMessage.pending, (state) => {

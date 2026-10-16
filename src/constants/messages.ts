@@ -1,6 +1,7 @@
 // Text the app's logic produces for the user. Static labels stay in the components that
 // show them.
 
+import { MAX_MASK, MIN_MASK } from './channelMasks';
 import { Status } from './status';
 
 /** What the app says while it works. It says nothing when idle. */
@@ -21,6 +22,8 @@ export const Problem = {
     "This image doesn't hold a message. If it did, the image may have changed since, for " +
     'example by being saved as a JPEG or sent through a chat app.',
   NOT_TEXT: "This image holds hidden data, but it isn't text.",
+  MASK_OUT_OF_RANGE: `Each mask is a whole number from ${MIN_MASK} to ${MAX_MASK}.`,
+  NO_BITS_SELECTED: 'Select at least one bit.',
   /** Starts the description of an error nobody planned for. */
   UNEXPECTED: 'Something went wrong:',
 } as const;

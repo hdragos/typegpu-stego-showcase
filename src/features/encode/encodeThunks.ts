@@ -30,7 +30,8 @@ export const loadCarrier = createAsyncThunk<CarrierInfo, LoadCarrierArgs, ThunkC
     try {
       const image = file ?? (await drawSample());
       const { pixels, filledTransparency } = await readCarrier(image);
-      const capacity = (await getCodec(algorithm)).capacity(pixels);
+      const codec = await getCodec(algorithm, getState().channelMasks);
+      const capacity = codec.capacity(pixels);
       // A filled image looks different from its file, so show the pixels actually used.
       const preview = filledTransparency ? await toPng(pixels) : image;
       const previous = getState().encode;
@@ -52,6 +53,30 @@ export const loadCarrier = createAsyncThunk<CarrierInfo, LoadCarrierArgs, ThunkC
   },
 );
 
+interface MeasureCarrierArgs {
+  readonly algorithm: Algorithm;
+  readonly carrierId: string;
+}
+
+interface MeasuredCarrier {
+  readonly carrierId: string;
+  /** The longest message it can hold, in bytes. */
+  readonly capacity: number;
+}
+
+/** Work out again how much the carrier can hold, such as with new channel masks. */
+export const measureCarrier = createAsyncThunk<MeasuredCarrier, MeasureCarrierArgs, ThunkConfig>(
+  ThunkType.MEASURE_CARRIER,
+  async ({ algorithm, carrierId }, { getState, rejectWithValue }) => {
+    try {
+      const codec = await getCodec(algorithm, getState().channelMasks);
+      return { carrierId, capacity: codec.capacity(recallPixels(carrierId)) };
+    } catch (caught) {
+      return rejectWithValue(describeProblem(caught));
+    }
+  },
+);
+
 /** Encode the message into the carrier, and keep the result as a PNG. */
 export const encodeMessage = createAsyncThunk<ImageInfo, Algorithm, ThunkConfig>(
   ThunkType.ENCODE_MESSAGE,
@@ -61,7 +86,8 @@ export const encodeMessage = createAsyncThunk<ImageInfo, Algorithm, ThunkConfig>
       if (carrier === null) {
         return rejectWithValue(Problem.NO_IMAGE);
       }
-      const encoded = await hideMessage(algorithm, recallPixels(carrier.id), message);
+      const codec = await getCodec(algorithm, getState().channelMasks);
+      const encoded = await hideMessage(codec, recallPixels(carrier.id), message);
       const png = await toPng(encoded);
       forgetImage(getState().encode.result?.id);
       const { id, previewUrl } = rememberImage(png, { file: png });

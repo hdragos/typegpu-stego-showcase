@@ -6,6 +6,8 @@ import { Operation } from './operations';
  */
 export const ThunkType = {
   LOAD_CARRIER: `${Operation.ENCODE}/loadCarrier`,
+  MEASURE_CARRIER: `${Operation.ENCODE}/measureCarrier`,
   ENCODE_MESSAGE: `${Operation.ENCODE}/encodeMessage`,
   DECODE_IMAGE: `${Operation.DECODE}/decodeImage`,
+  REDECODE_IMAGE: `${Operation.DECODE}/redecodeImage`,
 } as const;
