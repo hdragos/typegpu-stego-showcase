@@ -1,13 +1,20 @@
 import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { Problem } from '../../constants/messages';
 import { Operation } from '../../constants/operations';
+import type { SecretKind } from '../../constants/secrets';
 import { Status } from '../../constants/status';
 import type { ImageInfo } from '../../stego/imageStore';
+import type { SecretFileInfo } from '../../stego/secretFiles';
 import { decodeImage, redecodeImage } from './decodeThunks';
 
-/** What decoding an image found: its message, or why it has none. */
+/** A secret found in an image, as Redux keeps it: a file is kept elsewhere, by id. */
+export type FoundSecret =
+  | { readonly kind: typeof SecretKind.TEXT; readonly message: string }
+  | { readonly kind: typeof SecretKind.FILE; readonly file: SecretFileInfo };
+
+/** What decoding an image found: its secret, or why it has none. */
 export type DecodeOutcome =
-  | { readonly found: true; readonly message: string }
+  | { readonly found: true; readonly secret: FoundSecret }
   | { readonly found: false; readonly problem: string };
 
 export interface DecodeState {

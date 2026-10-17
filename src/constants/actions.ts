@@ -7,7 +7,7 @@ import { Operation } from './operations';
 export const ThunkType = {
   LOAD_CARRIER: `${Operation.ENCODE}/loadCarrier`,
   MEASURE_CARRIER: `${Operation.ENCODE}/measureCarrier`,
-  ENCODE_MESSAGE: `${Operation.ENCODE}/encodeMessage`,
+  ENCODE_SECRET: `${Operation.ENCODE}/encodeSecret`,
   DECODE_IMAGE: `${Operation.DECODE}/decodeImage`,
   REDECODE_IMAGE: `${Operation.DECODE}/redecodeImage`,
 } as const;

@@ -9,6 +9,9 @@ The toolbar has an Encode and a Decode menu, and each lists the algorithms it ca
 use: LSB for now, with PVD to follow. Everything runs in the browser: images are
 never uploaded.
 
+Hide a text message, or any file that fits. A file keeps its name, and a checksum
+confirms that it comes back intact.
+
 Both pages share the channel masks: which bits of red, green and blue hold the
 message. The default, 1, 1, 1, is the lowest bit of each. Change them by number, or
 bit by bit. An image decodes only with the masks it was encoded with.
