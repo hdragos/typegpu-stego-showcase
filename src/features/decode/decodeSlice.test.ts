@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Algorithm } from '../../constants/algorithms';
+import { SecretKind } from '../../constants/secrets';
 import { Status } from '../../constants/status';
 import type { ImageInfo } from '../../stego/imageStore';
 import { decodeReducer, initialDecodeState, type DecodeOutcome } from './decodeSlice';
@@ -13,7 +14,10 @@ const image: ImageInfo = {
   previewUrl: 'blob:image',
 };
 const notFound: DecodeOutcome = { found: false, problem: 'No message.' };
-const found: DecodeOutcome = { found: true, message: 'Meet at noon.' };
+const found: DecodeOutcome = {
+  found: true,
+  secret: { kind: SecretKind.TEXT, message: 'Meet at noon.' },
+};
 
 describe('decodeReducer', () => {
   it('shows the outcome of decoding the image on screen again', () => {

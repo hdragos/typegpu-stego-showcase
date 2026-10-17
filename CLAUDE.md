@@ -14,8 +14,9 @@ message in an image, and reveal it again. It will be published with GitHub Pages
   knows nothing about steganography. App code lives in `src/app/`, `src/features/` and
   `src/stego/`.
 - App-wide state uses Redux (Redux Toolkit, whose store includes redux-thunk), never
-  React Context. Redux keeps plain data only: files and pixels stay in
-  `src/stego/imageStore.ts`, looked up by id.
+  React Context. Redux keeps plain data only: images' files and pixels stay in
+  `src/stego/imageStore.ts`, and secret files in `src/stego/secretFiles.ts`, looked up
+  by id.
 - Everything runs in the browser. Images are never uploaded.
 - Make sure that all checks pass before pushing: `pnpm run format:check`, `lint`,
   `typecheck`, `test` and `build`.

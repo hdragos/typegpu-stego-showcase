@@ -1,10 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { Algorithm } from '../../constants/algorithms';
+import { SecretKind } from '../../constants/secrets';
 import { Status } from '../../constants/status';
 import { mapChannels } from '../../stego/channelMasks';
 import { channelMasksChanged } from '../channelMasks/channelMasksSlice';
-import { encodeReducer, initialEncodeState, messageChanged, type CarrierInfo } from './encodeSlice';
-import { encodeMessage, loadCarrier, measureCarrier } from './encodeThunks';
+import {
+  encodeReducer,
+  fileChosen,
+  initialEncodeState,
+  messageChanged,
+  secretKindChanged,
+  type CarrierInfo,
+} from './encodeSlice';
+import { encodeSecret, loadCarrier, measureCarrier } from './encodeThunks';
 
 const carrier: CarrierInfo = {
   id: 'carrier',
@@ -29,6 +37,20 @@ describe('encodeReducer', () => {
     const next = encodeReducer({ ...initialEncodeState, carrier, result }, messageChanged('new'));
     expect(next.message).toBe('new');
     expect(next.result).toBeNull();
+  });
+
+  it('drops the encoded image when it switches between the message and the file', () => {
+    const next = encodeReducer(
+      { ...initialEncodeState, carrier, result },
+      secretKindChanged(SecretKind.FILE),
+    );
+    expect(next).toMatchObject({ secretKind: SecretKind.FILE, result: null });
+  });
+
+  it('drops the encoded image when another file is chosen', () => {
+    const file = { id: 'file', name: 'notes.pdf', size: 5, url: 'blob:file' };
+    const next = encodeReducer({ ...initialEncodeState, carrier, result }, fileChosen(file));
+    expect(next).toMatchObject({ file, result: null });
   });
 
   it('drops the encoded image, and keeps the carrier, when the channel masks change', () => {
@@ -63,8 +85,8 @@ describe('encodeReducer', () => {
   it('keeps the plain-words problem when encoding fails', () => {
     const failed = encodeReducer(
       { ...initialEncodeState, carrier },
-      encodeMessage.rejected(null, 'request', Algorithm.LSB, 'Too long.'),
+      encodeSecret.rejected(null, 'request', Algorithm.LSB, 'Too big.'),
     );
-    expect(failed).toMatchObject({ status: Status.IDLE, problem: 'Too long.', result: null });
+    expect(failed).toMatchObject({ status: Status.IDLE, problem: 'Too big.', result: null });
   });
 });

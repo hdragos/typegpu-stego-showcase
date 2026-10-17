@@ -12,7 +12,7 @@ import { EncodeControls } from './EncodeControls';
 import { EncodedResult } from './EncodedResult';
 
 /**
- * The encode page: the image on the left, the message and the channel masks on the right,
+ * The encode page: the image on the left, the secret and the channel masks on the right,
  * and the result below.
  */
 export function EncodePage() {
@@ -30,7 +30,7 @@ function EncodeWorkspace({ algorithm }: { readonly algorithm: Algorithm }) {
     <>
       <PageHeader
         title={`${OPERATION_LABEL[Operation.ENCODE]} with ${info.name}`}
-        description={`Hide a secret message in an image. ${info.summary}`}
+        description={`Hide a secret message or file in an image. ${info.summary}`}
       />
       <TwoPaneLayout
         main={<CarrierPane algorithm={algorithm} />}

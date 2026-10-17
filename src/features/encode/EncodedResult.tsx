@@ -60,7 +60,7 @@ export function EncodedResult({ algorithm, result }: EncodedResultProps) {
                 afterLabel: 'Encoded',
               }
         }
-        caption="It now holds your message. Keep it as a PNG, and share it as a file: apps that compress images, such as most chat apps, destroy the message."
+        caption="It now holds your secret. Keep it as a PNG, and share it as a file: apps that compress images, such as most chat apps, destroy the secret."
       />
     </Panel>
   );

@@ -3,13 +3,16 @@ import type { RootState } from '../../app/store';
 import { ThunkType } from '../../constants/actions';
 import type { Algorithm } from '../../constants/algorithms';
 import { Problem } from '../../constants/messages';
-import { getCodec, hideMessage } from '../../stego/codec';
+import { SecretKind } from '../../constants/secrets';
+import { getCodec, hideSecret } from '../../stego/codec';
 import { encodedFileName } from '../../stego/format';
 import { forgetImage, recallPixels, rememberImage, type ImageInfo } from '../../stego/imageStore';
 import { readCarrier, toPng } from '../../stego/images';
 import { describeProblem } from '../../stego/problems';
 import { drawSample } from '../../stego/sample';
-import type { CarrierInfo } from './encodeSlice';
+import { recallSecretFile } from '../../stego/secretFiles';
+import type { Secret } from '../../stego/secrets';
+import type { CarrierInfo, EncodeState } from './encodeSlice';
 
 interface ThunkConfig {
   readonly state: RootState;
@@ -23,7 +26,7 @@ interface LoadCarrierArgs {
   readonly file: File | null;
 }
 
-/** Read an image to encode a message into, and work out how much it can hold. */
+/** Read an image to encode a secret into, and work out how much it can hold. */
 export const loadCarrier = createAsyncThunk<CarrierInfo, LoadCarrierArgs, ThunkConfig>(
   ThunkType.LOAD_CARRIER,
   async ({ algorithm, file }, { getState, rejectWithValue }) => {
@@ -60,7 +63,7 @@ interface MeasureCarrierArgs {
 
 interface MeasuredCarrier {
   readonly carrierId: string;
-  /** The longest message it can hold, in bytes. */
+  /** The most it can hold, in bytes. */
   readonly capacity: number;
 }
 
@@ -77,17 +80,21 @@ export const measureCarrier = createAsyncThunk<MeasuredCarrier, MeasureCarrierAr
   },
 );
 
-/** Encode the message into the carrier, and keep the result as a PNG. */
-export const encodeMessage = createAsyncThunk<ImageInfo, Algorithm, ThunkConfig>(
-  ThunkType.ENCODE_MESSAGE,
+/** Hide the secret, the message or the file, in the carrier, and keep the result as a PNG. */
+export const encodeSecret = createAsyncThunk<ImageInfo, Algorithm, ThunkConfig>(
+  ThunkType.ENCODE_SECRET,
   async (algorithm, { getState, rejectWithValue }) => {
     try {
-      const { carrier, message } = getState().encode;
+      const { carrier } = getState().encode;
       if (carrier === null) {
         return rejectWithValue(Problem.NO_IMAGE);
       }
+      const secret = await currentSecret(getState().encode);
+      if (secret === null) {
+        return rejectWithValue(Problem.NO_FILE);
+      }
       const codec = await getCodec(algorithm, getState().channelMasks);
-      const encoded = await hideMessage(codec, recallPixels(carrier.id), message);
+      const encoded = await hideSecret(codec, recallPixels(carrier.id), secret);
       const png = await toPng(encoded);
       forgetImage(getState().encode.result?.id);
       const { id, previewUrl } = rememberImage(png, { file: png });
@@ -103,3 +110,15 @@ export const encodeMessage = createAsyncThunk<ImageInfo, Algorithm, ThunkConfig>
     }
   },
 );
+
+/** The secret the encode page holds, or null when it's to hide a file and none is chosen. */
+async function currentSecret({ secretKind, message, file }: EncodeState): Promise<Secret | null> {
+  if (secretKind === SecretKind.TEXT) {
+    return { kind: SecretKind.TEXT, message };
+  }
+  if (file === null) {
+    return null;
+  }
+  const content = new Uint8Array(await recallSecretFile(file.id).arrayBuffer());
+  return { kind: SecretKind.FILE, name: file.name, content };
+}
