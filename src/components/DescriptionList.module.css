@@ -11,10 +11,15 @@
 }
 
 .term {
+  flex: none;
   color: var(--muted);
 }
 
+/* Long details, such as a file name, wrap rather than widen the list. */
 .details {
+  min-width: 0;
   margin: 0;
+  overflow-wrap: anywhere;
+  text-align: end;
   font-variant-numeric: tabular-nums;
 }

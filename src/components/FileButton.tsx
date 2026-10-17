@@ -3,8 +3,8 @@ import { Button } from './Button';
 import type { ButtonVariant } from './constants';
 
 interface FileButtonProps {
-  /** Which files to offer, as in a file input's `accept` attribute. */
-  readonly accept: string;
+  /** Which files to offer, as in a file input's `accept` attribute. Any file when left out. */
+  readonly accept?: string;
   readonly onFile: (file: File) => void;
   readonly children: ReactNode;
   readonly variant?: ButtonVariant;
