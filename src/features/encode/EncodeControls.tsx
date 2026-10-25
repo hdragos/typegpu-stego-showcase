@@ -2,41 +2,73 @@ import { useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Button } from '../../components/Button';
 import { NoticeKind } from '../../components/constants';
+import { FileField } from '../../components/FileField';
 import { Notice } from '../../components/Notice';
 import { Panel } from '../../components/Panel';
+import { SegmentedControl } from '../../components/SegmentedControl';
 import { TextArea } from '../../components/TextArea';
 import type { Algorithm } from '../../constants/algorithms';
 import { STATUS_MESSAGE } from '../../constants/messages';
+import { SECRET_KIND_LABEL, SECRET_KINDS, SecretKind } from '../../constants/secrets';
 import { Status } from '../../constants/status';
-import { textToBytes } from '../../stego/codec';
 import { formatBytes } from '../../stego/format';
-import { changeMessage } from './encodeSlice';
-import { encodeMessage } from './encodeThunks';
+import type { SecretFileInfo } from '../../stego/secretFiles';
+import { packedFileSize, textToBytes } from '../../stego/secrets';
+import { changeMessage, changeSecretKind, chooseFile } from './encodeSlice';
+import { encodeSecret } from './encodeThunks';
 
-/** The control pane: the message to hide, and the button that encodes it. */
+const SECRET_KIND_SEGMENTS = SECRET_KINDS.map((kind) => ({
+  value: kind,
+  label: SECRET_KIND_LABEL[kind],
+}));
+
+/** The control pane: the secret to hide, a message or a file, and the button that encodes it. */
 export function EncodeControls({ algorithm }: { readonly algorithm: Algorithm }) {
   const dispatch = useAppDispatch();
-  const { carrier, message, status, problem } = useAppSelector((state) => state.encode);
+  const { carrier, secretKind, message, file, status, problem } = useAppSelector(
+    (state) => state.encode,
+  );
   const messageBytes = useMemo(() => textToBytes(message).length, [message]);
+  const hidingText = secretKind === SecretKind.TEXT;
+  const secretBytes = hidingText ? messageBytes : packedSize(file);
   const capacity = carrier?.capacity ?? 0;
-  const tooLong = messageBytes > capacity;
+  const tooBig = secretBytes > capacity;
+  const nothingToHide = hidingText ? messageBytes === 0 : file === null;
+  const hint = `${formatBytes(secretBytes)} of ${formatBytes(capacity)}`;
   const statusMessage = STATUS_MESSAGE[status];
 
   return (
-    <Panel title="Message">
-      <TextArea
-        label="The message to hide"
-        placeholder={carrier === null ? 'Choose an image first' : 'Write a secret message'}
-        rows={10}
-        value={message}
-        disabled={carrier === null}
-        invalid={tooLong}
-        hint={`${formatBytes(messageBytes)} of ${formatBytes(capacity)}`}
-        onChange={(event) => dispatch(changeMessage(event.target.value))}
+    <Panel title="Secret">
+      <SegmentedControl
+        label="What to hide"
+        segments={SECRET_KIND_SEGMENTS}
+        value={secretKind}
+        onChange={(kind) => dispatch(changeSecretKind(kind))}
       />
+      {hidingText ? (
+        <TextArea
+          label="The message to hide"
+          placeholder={carrier === null ? 'Choose an image first' : 'Write a secret message'}
+          rows={10}
+          value={message}
+          disabled={carrier === null}
+          invalid={tooBig}
+          hint={hint}
+          onChange={(event) => dispatch(changeMessage(event.target.value))}
+        />
+      ) : (
+        <FileField
+          label="The file to hide"
+          fileName={file?.name ?? null}
+          disabled={carrier === null}
+          invalid={tooBig}
+          hint={hint}
+          onFile={(chosen) => dispatch(chooseFile(chosen))}
+        />
+      )}
       <Button
-        disabled={carrier === null || messageBytes === 0 || tooLong || status !== Status.IDLE}
-        onClick={() => void dispatch(encodeMessage(algorithm))}
+        disabled={carrier === null || nothingToHide || tooBig || status !== Status.IDLE}
+        onClick={() => void dispatch(encodeSecret(algorithm))}
       >
         Encode
       </Button>
@@ -44,4 +76,9 @@ export function EncodeControls({ algorithm }: { readonly algorithm: Algorithm })
       {problem !== null && <Notice kind={NoticeKind.PROBLEM}>{problem}</Notice>}
     </Panel>
   );
+}
+
+/** How many bytes the file takes once packed, or none before a file is chosen. */
+function packedSize(file: SecretFileInfo | null): number {
+  return file === null ? 0 : packedFileSize(file.name, file.size);
 }

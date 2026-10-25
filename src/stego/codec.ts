@@ -1,4 +1,4 @@
-// Hiding text in images and reading it back, through typegpu-stego.
+// Hiding secrets in images and reading them back, through typegpu-stego.
 
 import {
   GpuBackendError,
@@ -9,17 +9,8 @@ import {
 } from 'typegpu-stego';
 import { Algorithm } from '../constants/algorithms';
 import type { ChannelMasks } from '../constants/channelMasks';
-import { Problem } from '../constants/messages';
-import { TEXT_ENCODING } from '../constants/text';
 import { sameMasks, toLibraryMasks } from './channelMasks';
-
-/** Thrown when an image holds hidden data that isn't UTF-8 text. */
-export class NotTextError extends Error {
-  constructor(options?: ErrorOptions) {
-    super(Problem.NOT_TEXT, options);
-    this.name = 'NotTextError';
-  }
-}
+import { packSecret, unpackSecret, type Secret } from './secrets';
 
 let device: Promise<GPUDevice | null> | undefined;
 
@@ -61,31 +52,19 @@ async function createCodec(algorithm: Algorithm, channelMasks: ChannelMasks): Pr
   }
 }
 
-export function textToBytes(message: string): Uint8Array {
-  return new TextEncoder().encode(message);
-}
-
-/** Read bytes as UTF-8 text. Throws a {@link NotTextError} if they aren't. */
-export function bytesToText(bytes: Uint8Array): string {
-  try {
-    return new TextDecoder(TEXT_ENCODING, { fatal: true }).decode(bytes);
-  } catch (cause) {
-    throw new NotTextError({ cause });
-  }
-}
-
-/** Hide `message` in a copy of `carrier`. */
-export function hideMessage(
+/** Hide `secret` in a copy of `carrier`. */
+export async function hideSecret(
   codec: StegoCodec,
   carrier: PixelBuffer,
-  message: string,
+  secret: Secret,
 ): Promise<PixelBuffer> {
-  return retryAfterGpuFailure(() => codec.encode(carrier, textToBytes(message)));
+  const payload = await packSecret(secret);
+  return retryAfterGpuFailure(() => codec.encode(carrier, payload));
 }
 
-/** Read the message hidden in `image`. */
-export async function revealMessage(codec: StegoCodec, image: PixelBuffer): Promise<string> {
-  return bytesToText(await retryAfterGpuFailure(() => codec.decode(image)));
+/** Read the secret hidden in `image`. */
+export async function revealSecret(codec: StegoCodec, image: PixelBuffer): Promise<Secret> {
+  return unpackSecret(await retryAfterGpuFailure(() => codec.decode(image)));
 }
 
 /**
